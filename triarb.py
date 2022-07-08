@@ -86,19 +86,21 @@ async def check_arb():
         order1 = post_Alpaca_order("BTCUSD", BUY_BTC, "buy")
         if order1.status_code != 200:
             # print("BTC bought")
-            return False
+            print("Bad Order 1")
+            exit()
         else:
             order2 = post_Alpaca_order("ETH/BTC", BUY_BTC, "buy")
             if order2.status_code != 200:
                 post_Alpaca_order("BTCUSD", BUY_BTC, "sell")
-                return False
+                print("Bad Order 2")
+                exit()
             else:
                 order3 = post_Alpaca_order("ETHUSD", SELL_ETH, "sell")
                 if order3.status_code != 200:
                 # print("ETHBTC bought")
-                    post_Alpaca_order("BTCUSD", BUY_BTC, "sell")
                     post_Alpaca_order("ETH/BTC", BUY_BTC, "sell")
-                    return False
+                    print("Bad Order 3")
+                    exit()
                 else:
                     print("Done (type 1) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
                 
@@ -106,19 +108,21 @@ async def check_arb():
         order1 = post_Alpaca_order("ETHUSD", BUY_ETH, "buy")
         if order1.status_code != 200:
             # print("eth bought")
-            return False
+            print("Bad order 1")
+            exit()
         else:
             order2 = post_Alpaca_order("ETH/BTC", BUY_ETH, "sell")
             if order2.status_code != 200:
                 # print("eth/btc bought")
                 post_Alpaca_order("ETHUSD", BUY_ETH, "sell")
-                return False
+                print("Bad Order 2")
+                exit()
             else:
                 order3 = post_Alpaca_order("BTCUSD", SELL_BTC, "sell")
                 if order3.status_code != 200:
-                    post_Alpaca_order("ETHUSD", BUY_ETH, "sell")
-                    post_Alpaca_order("ETH/BTC", BUY_ETH, "buy")                  
-                    return False
+                    post_Alpaca_order("ETH/BTC", BUY_ETH, "buy")  
+                    print("Bad Order 3")                
+                    exit()
                 else:
                     print("Done (type 2) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
 
