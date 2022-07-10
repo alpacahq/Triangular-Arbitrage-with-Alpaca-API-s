@@ -28,7 +28,7 @@ prices = {
 # time between each quote
 waitTime = 2
 
-min_arb_percent = 0.15
+min_arb_percent = 0.3
 
 async def main():
         while True:
@@ -77,10 +77,10 @@ async def check_arb():
     BTC = prices['BTCUSD']
     ETHBTC = prices['ETH/BTC']
     DIV = ETH / BTC 
-    BUY_ETH = 500 / ETH
-    BUY_BTC = 500 / BTC 
-    SELL_BTC = BUY_ETH * ETHBTC
-    SELL_ETH = BUY_BTC / ETHBTC
+    BUY_ETH = 1000 / ETH
+    BUY_BTC = 1000 / BTC 
+    BUY_ETHBTC = BUY_BTC / ETHBTC
+    SELL_ETHBTC = BUY_ETH / ETHBTC
 
     if DIV > ETHBTC * (1 + min_arb_percent/100):
         order1 = post_Alpaca_order("BTCUSD", BUY_BTC, "buy")
@@ -89,13 +89,13 @@ async def check_arb():
             print("Bad Order 1")
             exit()
         else:
-            order2 = post_Alpaca_order("ETH/BTC", BUY_BTC, "buy")
+            order2 = post_Alpaca_order("ETH/BTC", BUY_ETHBTC, "buy")
             if order2.status_code != 200:
                 post_Alpaca_order("BTCUSD", BUY_BTC, "sell")
                 print("Bad Order 2")
                 exit()
             else:
-                order3 = post_Alpaca_order("ETHUSD", SELL_ETH, "sell")
+                order3 = post_Alpaca_order("ETHUSD", BUY_ETHBTC, "sell")
                 if order3.status_code != 200:
                 # print("ETHBTC bought")
                     post_Alpaca_order("ETH/BTC", BUY_BTC, "sell")
@@ -111,14 +111,14 @@ async def check_arb():
             print("Bad order 1")
             exit()
         else:
-            order2 = post_Alpaca_order("ETH/BTC", BUY_ETH, "sell")
+            order2 = post_Alpaca_order("ETH/BTC", SELL_ETHBTC, "sell")
             if order2.status_code != 200:
                 # print("eth/btc bought")
-                post_Alpaca_order("ETHUSD", BUY_ETH, "sell")
+                post_Alpaca_order("ETHUSD", BUY_BTC, "sell")
                 print("Bad Order 2")
                 exit()
             else:
-                order3 = post_Alpaca_order("BTCUSD", SELL_BTC, "sell")
+                order3 = post_Alpaca_order("BTCUSD", SELL_ETHBTC, "sell")
                 if order3.status_code != 200:
                     post_Alpaca_order("ETH/BTC", BUY_ETH, "buy")  
                     print("Bad Order 3")                
