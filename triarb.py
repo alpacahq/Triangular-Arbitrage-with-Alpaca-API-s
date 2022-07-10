@@ -84,51 +84,45 @@ async def check_arb():
 
     if DIV > ETHBTC * (1 + min_arb_percent/100):
         order1 = post_Alpaca_order("BTCUSD", BUY_BTC, "buy")
-        if order1.status_code != 200:
-            # print("BTC bought")
-            print("Bad Order 1")
-            exit()
-        else:
+        if order1.status_code == 200:
             order2 = post_Alpaca_order("ETH/BTC", BUY_ETHBTC, "buy")
-            if order2.status_code != 200:
+            if order2.status_code == 200:
+                order3 = post_Alpaca_order("ETHUSD", BUY_ETHBTC, "sell")
+                if order3.status_code == 200:
+                    print("Done (type 1) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
+                else:
+                    post_Alpaca_order("ETH/BTC", BUY_ETHBTC, "sell")
+                    print("Bad Order 3")
+                    exit()
+            else:
                 post_Alpaca_order("BTCUSD", BUY_BTC, "sell")
                 print("Bad Order 2")
                 exit()
-            else:
-                order3 = post_Alpaca_order("ETHUSD", BUY_ETHBTC, "sell")
-                if order3.status_code != 200:
-                # print("ETHBTC bought")
-                    post_Alpaca_order("ETH/BTC", BUY_BTC, "sell")
-                    print("Bad Order 3")
-                    exit()
-                else:
-                    print("Done (type 1) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
+        else:
+            print("Bad Order 1")
+            exit()
                 
     elif DIV < ETHBTC * (1 - min_arb_percent/100):
         order1 = post_Alpaca_order("ETHUSD", BUY_ETH, "buy")
-        if order1.status_code != 200:
-            # print("eth bought")
-            print("Bad order 1")
-            exit()
-        else:
+        if order1.status_code == 200:
             order2 = post_Alpaca_order("ETH/BTC", SELL_ETHBTC, "sell")
-            if order2.status_code != 200:
-                # print("eth/btc bought")
-                post_Alpaca_order("ETHUSD", BUY_BTC, "sell")
-                print("Bad Order 2")
-                exit()
-            else:
+            if order2.status_code == 200:
                 order3 = post_Alpaca_order("BTCUSD", SELL_ETHBTC, "sell")
-                if order3.status_code != 200:
-                    post_Alpaca_order("ETH/BTC", BUY_ETH, "buy")  
+                if order3.status_code == 200:
+                    print("Done (type 2) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
+                else:
+                    post_Alpaca_order("ETH/BTC", SELL_ETHBTC, "buy")  
                     print("Bad Order 3")                
                     exit()
-                else:
-                    print("Done (type 2) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
-
+            else:
+                post_Alpaca_order("ETHUSD", BUY_BTC, "sell")
+                print("Bad Order 2")
+                exit()     
+        else:
+            print("Bad order 1")
+            exit()
     else:
         print("No arb opportunity")
-# get_quote('')
 
 def post_Alpaca_order(symbol, qty, side):
     '''
