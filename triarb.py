@@ -26,7 +26,7 @@ prices = {
 }
 
 # time between each quote
-waitTime = 2
+waitTime = 5
 
 min_arb_percent = 0.3
 
@@ -77,6 +77,7 @@ async def check_arb():
     BTC = prices['BTCUSD']
     ETHBTC = prices['ETH/BTC']
     DIV = ETH / BTC 
+    spread = abs(DIV - ETHBTC)
     BUY_ETH = 1000 / ETH
     BUY_BTC = 1000 / BTC 
     BUY_ETHBTC = BUY_BTC / ETHBTC
@@ -90,6 +91,7 @@ async def check_arb():
                 order3 = post_Alpaca_order("ETHUSD", BUY_ETHBTC, "sell")
                 if order3.status_code == 200:
                     print("Done (type 1) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
+                    print("Spread: +{}".format(spread * 100))
                 else:
                     post_Alpaca_order("ETH/BTC", BUY_ETHBTC, "sell")
                     print("Bad Order 3")
@@ -110,6 +112,7 @@ async def check_arb():
                 order3 = post_Alpaca_order("BTCUSD", SELL_ETHBTC, "sell")
                 if order3.status_code == 200:
                     print("Done (type 2) eth: {} btc: {} ethbtc {}".format(ETH, BTC, ETHBTC))
+                    print("Spread: -{}".format(spread * 100))
                 else:
                     post_Alpaca_order("ETH/BTC", SELL_ETHBTC, "buy")  
                     print("Bad Order 3")                
@@ -122,7 +125,7 @@ async def check_arb():
             print("Bad order 1")
             exit()
     else:
-        print("No arb opportunity")
+        print("No arb opportunity, spread: {}".format(spread * 100))
 
 def post_Alpaca_order(symbol, qty, side):
     '''
