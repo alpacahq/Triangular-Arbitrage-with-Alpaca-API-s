@@ -12,9 +12,11 @@ HEADERS = {'APCA-API-KEY-ID': API_KEY,
 
 ALPACA_BASE_URL = 'https://paper-api.alpaca.markets'
 DATA_URL = 'https://data.alpaca.markets'
+
 # initiate alpaca connection
 rest_api = alpaca.REST(API_KEY, SECRET_KEY, ALPACA_BASE_URL)
 
+# initialize spreads and prices
 spreads = []
 prices = {
     'ETHUSD' : 0,
@@ -22,9 +24,8 @@ prices = {
     'ETH/BTC' : 0
 }
 
-# time between each quote
+# time between each quote & arb percent
 waitTime = 1
-
 min_arb_percent = 0.3
 
 async def main():
@@ -56,8 +57,6 @@ async def get_quote(symbol: str):
         if quote.status_code != 200:
             print("Undesirable response from Alpaca! {}".format(quote.json()))
             return False
-        # Get the latest quoted asking price from the quote response in terms US Dollar
-        # # Log the latest quote of MATICUSD
 
     except Exception as e:
         print("There was an issue getting trade quote from Alpaca: {0}".format(e))
@@ -69,8 +68,7 @@ async def check_arb():
     '''
     Check to see if an arbitrage condition exists
     '''
-    # get_quote("ETHUSD")
-    # get_quote("BTCUSD")
+
     ETH = prices['ETHUSD']
     BTC = prices['BTCUSD']
     ETHBTC = prices['ETH/BTC']
@@ -81,6 +79,7 @@ async def check_arb():
     BUY_ETHBTC = BUY_BTC / ETHBTC
     SELL_ETHBTC = BUY_ETH / ETHBTC
 
+    # when BTCUSD is cheaper
     if DIV > ETHBTC * (1 + min_arb_percent/100):
         order1 = post_Alpaca_order("BTCUSD", BUY_BTC, "buy")
         if order1.status_code == 200:
@@ -101,7 +100,8 @@ async def check_arb():
         else:
             print("Bad Order 1")
             exit()
-                
+
+    # when ETHUSD is cheaper
     elif DIV < ETHBTC * (1 - min_arb_percent/100):
         order1 = post_Alpaca_order("ETHUSD", BUY_ETH, "buy")
         if order1.status_code == 200:
@@ -125,7 +125,8 @@ async def check_arb():
     else:
         print("No arb opportunity, spread: {}".format(spread * 100))
         spreads.append(spread)
-
+        
+# Function for placing orders
 def post_Alpaca_order(symbol, qty, side):
     '''
     Post an order to Alpaca
@@ -140,10 +141,10 @@ def post_Alpaca_order(symbol, qty, side):
                 'time_in_force': 'gtc',
             })
         return order
+
     except Exception as e:
         print("There was an issue posting order to Alpaca: {0}".format(e))
         return False
-
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
