@@ -1,15 +1,11 @@
 import alpaca_trade_api as alpaca
 import requests
 import asyncio
-# import pprint
+import config
 
 # Alpaca Constants
-API_KEY = 'PKJC1E2UEYY5JABS3ZSD'
-SECRET_KEY = 'ujyyROB5Kol8aiSassJHyb8FU74OfVypt9g5oWRH'
-
-
-LIVE_KEY = 'AKI9JGTTD8QXKDSDQSI4'
-LIVE_SECRET = 'ai3y4AAse5UIigrEbDgjA9oeyw1HQjctEEQp2ipK'
+API_KEY = config.API_KEY
+SECRET_KEY = config.SECRET_KEY
 
 HEADERS = {'APCA-API-KEY-ID': API_KEY,
            'APCA-API-SECRET-KEY': SECRET_KEY}
@@ -19,6 +15,7 @@ DATA_URL = 'https://data.alpaca.markets'
 # initiate alpaca connection
 rest_api = alpaca.REST(API_KEY, SECRET_KEY, ALPACA_BASE_URL)
 
+spreads = []
 prices = {
     'ETHUSD' : 0,
     'BTCUSD' : 0,
@@ -26,7 +23,7 @@ prices = {
 }
 
 # time between each quote
-waitTime = 5
+waitTime = 1
 
 min_arb_percent = 0.3
 
@@ -40,6 +37,7 @@ async def main():
             await check_arb()
             # # Wait for the value of waitTime between each quote request
             await asyncio.sleep(waitTime)
+
 
 async def get_quote(symbol: str):
     '''
@@ -126,6 +124,7 @@ async def check_arb():
             exit()
     else:
         print("No arb opportunity, spread: {}".format(spread * 100))
+        spreads.append(spread)
 
 def post_Alpaca_order(symbol, qty, side):
     '''
