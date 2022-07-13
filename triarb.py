@@ -105,7 +105,7 @@ async def check_arb():
     elif DIV < ETHBTC * (1 - min_arb_percent/100):
         order1 = post_Alpaca_order("ETHUSD", BUY_ETH, "buy")
         if order1.status_code == 200:
-            order2 = post_Alpaca_order("ETH/BTC", SELL_ETHBTC, "sell")
+            order2 = post_Alpaca_order("ETH/BTC", BUY_ETH, "sell")
             if order2.status_code == 200:
                 order3 = post_Alpaca_order("BTCUSD", SELL_ETHBTC, "sell")
                 if order3.status_code == 200:
