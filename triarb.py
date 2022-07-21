@@ -47,12 +47,8 @@ async def get_quote(symbol: str):
 
     try:
         # make the request
-        if symbol == "ETH/BTC":
-            quote = requests.get('{0}/v1beta2/crypto/latest/trades?symbols=ETH/BTC'.format(DATA_URL, headers=HEADERS))
-            prices[symbol] = quote.json()['trades'][symbol]['p']
-        else: 
-            quote = requests.get('{0}/v1beta1/crypto/{1}/trades/latest?exchange=FTXU'.format(DATA_URL, symbol), headers=HEADERS)
-            prices[symbol] = quote.json()['trade']['p']
+        quote = requests.get('{0}/v1beta2/crypto/latest/trades?symbols={1}'.format(DATA_URL, symbol), headers=HEADERS)
+        prices[symbol] = quote.json()['trades'][symbol]['p']
         # Status code 200 means the request was successful
         if quote.status_code != 200:
             print("Undesirable response from Alpaca! {}".format(quote.json()))
