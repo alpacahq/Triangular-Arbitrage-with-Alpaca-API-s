@@ -2,6 +2,7 @@ import alpaca_trade_api as alpaca
 import requests
 import asyncio
 import config
+from alpaca.data.live import CryptoDataStream
 
 # Alpaca Constants
 API_KEY = config.API_KEY
@@ -13,14 +14,25 @@ HEADERS = {'APCA-API-KEY-ID': API_KEY,
 ALPACA_BASE_URL = 'https://paper-api.alpaca.markets'
 DATA_URL = 'https://data.alpaca.markets'
 
+wss_client = CryptoDataStream()
 # initiate alpaca connection
 rest_api = alpaca.REST(API_KEY, SECRET_KEY, ALPACA_BASE_URL)
 
+
+async def quote_data_handler(data):
+    # quote data will arrive here
+    print(data)
+
+wss_client.subscribe_quotes(quote_data_handler, "ETH/USD")
+wss_client.subscribe_quotes(quote_data_handler, "BTC/USD")
+wss_client.subscribe_quotes(quote_data_handler, "BTC/ETH")
+
+wss_client.run()
 # initialize spreads and prices
 spreads = []
 prices = {
-    'ETHUSD' : 0,
-    'BTCUSD' : 0,
+    'ETH/USD' : 0,
+    'BTC/USD' : 0,
     'ETH/BTC' : 0
 }
 
@@ -30,8 +42,8 @@ min_arb_percent = 0.3
 
 async def main():
         while True:
-            task1 = loop.create_task(get_quote("ETHUSD"))
-            task2 = loop.create_task(get_quote("BTCUSD"))
+            task1 = loop.create_task(get_quote("ETH/USD"))
+            task2 = loop.create_task(get_quote("BTC/USD"))
             task3 = loop.create_task(get_quote("ETH/BTC"))
             # Wait for the tasks to finish
             await asyncio.wait([task1, task2, task3])
@@ -69,8 +81,8 @@ async def check_arb():
     Check to see if an arbitrage condition exists
     '''
 
-    ETH = prices['ETHUSD']
-    BTC = prices['BTCUSD']
+    ETH = prices['ETH/USD']
+    BTC = prices['BTC/USD']
     ETHBTC = prices['ETH/BTC']
     DIV = ETH / BTC 
     spread = abs(DIV - ETHBTC)
