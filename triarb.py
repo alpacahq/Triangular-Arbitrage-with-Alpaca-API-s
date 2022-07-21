@@ -2,7 +2,6 @@ import alpaca_trade_api as alpaca
 import requests
 import asyncio
 import config
-from alpaca.data.live import CryptoDataStream
 
 # Alpaca Constants
 API_KEY = config.API_KEY
@@ -14,20 +13,9 @@ HEADERS = {'APCA-API-KEY-ID': API_KEY,
 ALPACA_BASE_URL = 'https://paper-api.alpaca.markets'
 DATA_URL = 'https://data.alpaca.markets'
 
-wss_client = CryptoDataStream()
 # initiate alpaca connection
 rest_api = alpaca.REST(API_KEY, SECRET_KEY, ALPACA_BASE_URL)
 
-
-async def quote_data_handler(data):
-    # quote data will arrive here
-    print(data)
-
-wss_client.subscribe_quotes(quote_data_handler, "ETH/USD")
-wss_client.subscribe_quotes(quote_data_handler, "BTC/USD")
-wss_client.subscribe_quotes(quote_data_handler, "BTC/ETH")
-
-wss_client.run()
 # initialize spreads and prices
 spreads = []
 prices = {
@@ -128,7 +116,7 @@ async def check_arb():
                     print("Bad Order 3")                
                     exit()
             else:
-                post_Alpaca_order("ETHUSD", BUY_BTC, "sell")
+                post_Alpaca_order("ETHUSD", BUY_ETH, "sell")
                 print("Bad Order 2")
                 exit()     
         else:
