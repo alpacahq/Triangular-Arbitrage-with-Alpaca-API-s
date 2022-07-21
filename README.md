@@ -1,14 +1,12 @@
-# TradingAlgosPython
+# Triangular Arbitrage and Network-Size Momentum Investing
 
-## Triangular Arbitrage and Network-Size Momentum Investing
+## Triangular Arbitrage on BTC and ETH with Alpaca
 
-Triangular Arbitrage on BTC and ETH with Alpaca
-
-Background
+### Background
 
 With the exciting announcement of Alpaca’s coin pair trading, we introduce a triangular arbitrage strategy using BTC/USD, ETH/USD, and the new BTC/ETH coin pair to attempt to profit from potential differences between price conversions. 
 
-What is Triangular Arbitrage?
+### What is Triangular Arbitrage?
 
 Triangular Arbitrage is an arbitrage opportunity that appears between three currencies that don’t have equivalent conversion rates. Traders can buy the cheaper currency, convert it to a more expensive currency, and then sell the expensive currency - this typically happens across different exchanges. For example: 
 
@@ -25,7 +23,8 @@ Sell Yuan to buy Euros ->  6,844,200 / 6.83 -> 1,002,079 Euros
 1,002,079 - 1,000,000 = 2,079 euros of profit (excluding exchange fees)
 
 We will do this but with ETH/USD, the new ETH/BTC coin pair, and BTC/USD. Our specific strategy will be implemented just using Alpaca’s services - we won’t have to interact cross exchanges. 
-Why Triangular Arbitrage?
+
+### Why Triangular Arbitrage?
 
 Cryptocurrency pricing is volatile. This is largely because one cannot generally take traditional investing concepts and apply them successfully. There are a large number of unclear factors that can influence a cryptocurrency’s price. Arbitrage methods, including Triangular Arbitrage, are relatively risk-free and attempt to ensure a profit regardless of many market conditions, and generally don’t need to be monitored as often as other riskier strategies.
 
@@ -43,7 +42,7 @@ Implementation:
 
 To use Triangular Arbitrage, we must get the latest prices for each of these currency pairs. We then find the conversion rates, buy the cheaper currency, convert it into the expensive currency, and then finally sell the expensive currency. 
 
-Getting Started:
+### Getting Started:
 
 Create a new python file and import the following modules:
 
@@ -102,7 +101,7 @@ async def get_quote(symbol: str):
         print("There was an issue getting trade quote from Alpaca: {0}".format(e))
         return False
 
-Post Trade Function:
+### Post Trade Function:
 
 Now we define a function that places a trade on our account given a symbol, quantity, and side. We have kept type and time_in_force constant for the purposes of this tutorial, but you are more than free to add complexity to your code. This function will be called in our arbitrage condition checker function and will place trades when the condition appears. 
 
@@ -125,7 +124,7 @@ def post_alpaca_order(symbol, qty, side):
         print("There was an issue posting order to Alpaca: {0}".format(e))
         return False
 
-Arbitrage Condition Checker:
+### Arbitrage Condition Checker:
 
 This is the core of our strategy. Now that we have set up our connection to Alpaca, can fetch and store market data, and can post trades, let’s set up our arbitrage checker: it will calculate the discrepancies between conversion rates and then place the correct trade given that the discrepancies are large enough. This value was initialized as min_arb_percent.
 
@@ -163,7 +162,7 @@ We purchase an amount of ETH/USD (BUY_ETH in our code). Then we convert our ETH 
 
 This logic forms the second half of our arbitrage condition checker in which we place the correct trades given the condition. Feel free to play around with the min_arb_percent value, as trades will only occur given that the discrepancy is larger. 
 
-# when BTC/USD is cheaper
+
     if DIV > ETHBTC * (1 + min_arb_percent/100):
         order1 = post_Alpaca_order("BTCUSD", BUY_BTC, "buy")
         if order1.status_code == 200:
